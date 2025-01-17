@@ -1,6 +1,6 @@
 import { initialCards } from './scripts/cards.js';
 import { openModal, closeModal, } from './components/modal.js';
-import { createCard, deleteCard, renderCards, likeHandler  } from './components/card.js';
+import { createCard, deleteCard, likeHandler  } from './components/card.js';
 const editProfileButton = document.querySelector('.profile__edit-button');
 const addCardButton = document.querySelector('.profile__add-button');
 const editProfileModal = document.querySelector('.popup_type_edit');
@@ -23,7 +23,19 @@ const profileDescriptionElement = profileInfoElement.querySelector(".profile__de
 
 const cardTemplate = document.querySelector('#card-template').content.querySelector('.card');
 const placesList = document.querySelector('.places__list');
-renderCards(initialCards, openModal, cardModal, cardModalImage, cardModalCaption, cardTemplate);
+function handleCardImageClick(item, openModal, cardModal, cardModalImage, cardModalCaption) {
+  cardModalImage.src = item.link;
+  cardModalImage.alt = item.name;
+  cardModalCaption.textContent = item.name;
+  openModal(cardModal);
+}
+function renderCards(cards, openModal, cardModal, cardModalImage, cardModalCaption, cardTemplate, imageClickHandler) {
+    cards.forEach((card) => {
+  const cardElement = createCard(card, deleteCard, likeHandler, openModal, cardModal, cardModalImage, cardModalCaption, cardTemplate, imageClickHandler);
+  placesList.append(cardElement);
+});
+}
+renderCards(initialCards, openModal, cardModal, cardModalImage, cardModalCaption, cardTemplate, handleCardImageClick);
 import './pages/index.css';
 
 popups.forEach((popup) => {
@@ -34,7 +46,11 @@ popups.forEach((popup) => {
   });
 })
 
-editProfileButton.addEventListener('click', () =>  openModal(editProfileModal));
+editProfileButton.addEventListener('click', () => { 
+  nameInput.value = profileTitleElement.textContent;
+  jobInput.value = profileDescriptionElement.textContent;
+  openModal(editProfileModal);
+});
 addCardButton.addEventListener('click',() => openModal(addCardModal));
 
 closeButtons.forEach(button => {
@@ -51,7 +67,7 @@ function handleAddCardFormSubmit(evt) {
     name: cardNameInput.value,
     link: cardUrlInput.value
   };
-    const newCard = createCard( cardInfo, deleteCard, likeHandler, openModal, cardModal, cardModalImage, cardModalCaption);
+    const newCard = createCard( cardInfo, deleteCard, likeHandler, openModal, cardModal, cardModalImage, cardModalCaption, cardTemplate, handleCardImageClick);
     cardList.prepend(newCard);
 
     closeModal(addCardModal);

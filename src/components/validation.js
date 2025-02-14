@@ -20,6 +20,7 @@ export function clearValidation(form, validationConfig) {
     toggleButtonState(inputs, form.querySelector(validationConfig.submitButtonSelector), validationConfig.inactiveButtonClass);
     inputs.forEach((inputElement) => {
         hideInputError(form, inputElement, validationConfig.inputErrorClass, validationConfig.errorClass);
+        inputElement.setCustomValidity("");
     })
 }
 

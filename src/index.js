@@ -1,8 +1,8 @@
 import './pages/index.css';
 import { openModal, closeModal } from './components/modal';
-import { createCardElement, removeCardElement, likeHandler } from './components/card';
+import { createCardElement, removeCardElement, likeCallback } from './components/card';
 import { enableValidation, clearValidation } from './components/validation';
-import { getCurrentUserInfo, editCurrentUserInfo, editCurrentUserAvatar, getInitialCards, createCard, deleteCard, setLikeToCard, deleteLikeFromCard } from './components/api';
+import { getCurrentUserInfo, editCurrentUserInfo, editCurrentUserAvatar, getInitialCards, createCard, deleteCard } from './components/api';
 
 const validationConfig = {
   formSelector: '.popup__form',
@@ -71,8 +71,8 @@ addCardForm.addEventListener("submit", handleAddCardFormSubmit);
 editAvatarForm.addEventListener("submit", handleEditAvatarFormSubmit);
 
 editProfileAvatarElement.addEventListener("click", () => {
-  clearValidation(editAvatarForm, validationConfig);
   editAvatarForm.reset();
+  clearValidation(editAvatarForm, validationConfig);
   openModal(avatarEditModal);
 });
 
@@ -91,8 +91,8 @@ editProfileButton.addEventListener('click', () => {
   openModal(editProfileModal)
 });
 addCardButton.addEventListener('click', () => {
-  clearValidation(addCardForm, validationConfig)
   addCardForm.reset();
+  clearValidation(addCardForm, validationConfig)
   openModal(addCardModal)
 });
 
@@ -138,6 +138,7 @@ function handleEditProfileFormSubmit(evt) {
       profileTitleElement.textContent = updatedUserInfo.name;
       profileDescriptionElement.textContent = updatedUserInfo.about;
       profileImageElement.style.backgroundImage = `url(${user.avatar})`;
+      closeModal(editProfileModal);
     })
     .catch((err) => {
       console.log(err);
@@ -145,8 +146,6 @@ function handleEditProfileFormSubmit(evt) {
     .finally(() => {
       renderLoading(submitButtonElement, false);
     });
-
-  closeModal(editProfileModal);
 }
 
 function handleAddCardFormSubmit(evt) {
@@ -167,6 +166,7 @@ function handleAddCardFormSubmit(evt) {
         deleteCardCallback,
         likeCallback);
       cardList.prepend(newCard);
+      closeModal(addCardModal);
     })
     .catch((err) => {
       console.log(err);
@@ -175,9 +175,7 @@ function handleAddCardFormSubmit(evt) {
       renderLoading(submitButtonElement, false);
     });
 
-  closeModal(addCardModal);
-  cardNameInput.value = "";
-  cardUrlInput.value = "";
+
 }
 
 function handleEditAvatarFormSubmit(evt) {
@@ -189,6 +187,7 @@ function handleEditAvatarFormSubmit(evt) {
   editCurrentUserAvatar(url)
     .then((user) => {
       profileImageElement.style.backgroundImage = `url(${user.avatar})`;
+      closeModal(avatarEditModal);
     })
     .catch((err) => {
       console.log(err);
@@ -197,7 +196,7 @@ function handleEditAvatarFormSubmit(evt) {
       renderLoading(submitButtonElement, false);
     });
 
-  closeModal(avatarEditModal);
+
 }
 
 function renderLoading(button, isLoading) {
@@ -209,18 +208,7 @@ function renderLoading(button, isLoading) {
   }
 }
 
-const likeCallback = (cardId, cardElement, evt) => {
-  const likeMethod = cardElement.querySelector(".card__like-button").classList.contains("card__like-button_is-active")
-    ? deleteLikeFromCard
-    : setLikeToCard;
 
-  likeMethod(cardId)
-    .then((card) => {
-      cardElement.querySelector(".card__like-count").textContent = card.likes.length;
-      likeHandler(evt);
-    })
-    .catch(err => console.log(err));
-}
 
 const deleteCardCallback = (cardId, evt) => {
   const popup = openDeleteCardPopup();

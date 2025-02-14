@@ -1,3 +1,4 @@
+import { setLikeToCard, deleteLikeFromCard } from './api';
 export function createCardElement(
   currentUserId,
   cardTemplate,
@@ -42,4 +43,17 @@ export function removeCardElement(evt) {
 
 export function likeHandler(evt) {
   evt.target.classList.toggle("card__like-button_is-active");
+}
+
+ export const likeCallback = (cardId, cardElement, evt) => {
+  const likeMethod = cardElement.querySelector(".card__like-button").classList.contains("card__like-button_is-active")
+    ? deleteLikeFromCard
+    : setLikeToCard;
+
+  likeMethod(cardId)
+    .then((card) => {
+      cardElement.querySelector(".card__like-count").textContent = card.likes.length;
+      likeHandler(evt);
+    })
+    .catch(err => console.log(err));
 }
